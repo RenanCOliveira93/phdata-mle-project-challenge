@@ -1,6 +1,8 @@
-fastapi
-uvicorn
-pandas
-scikit-learn
-pydantic
-numpy
+# Pinned to the versions the API and tests were verified with.
+# scikit-learn must match the version model.pkl was created with (1.7.2).
+fastapi==0.141.1
+uvicorn==0.54.0
+pandas==2.3.3
+scikit-learn==1.7.2
+pydantic==2.13.5
+numpy==2.2.6

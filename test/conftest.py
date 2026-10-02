@@ -1,7 +1,11 @@
+import json
+import os
+from pathlib import Path
+
+import httpx
+import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
-import httpx
-import os
 
 
 @pytest.fixture
@@ -36,3 +40,41 @@ def sample_home_features():
         "sqft_basement": 300.0,
         "zipcode": "98042"
     }
+
+
+API_FIELDS = [
+    "bedrooms", "bathrooms", "sqft_living", "sqft_lot",
+    "floors", "sqft_above", "sqft_basement", "zipcode",
+]
+DATA_DIR = Path(__file__).resolve().parent.parent / "src" / "data"
+FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures"
+
+
+@pytest.fixture
+def future_unseen_rows():
+    """The 8 API fields of every row in future_unseen_examples.csv, in file order."""
+    examples = pd.read_csv(DATA_DIR / "future_unseen_examples.csv", dtype={"zipcode": str})
+    return examples[API_FIELDS].to_dict(orient="records")
+
+
+@pytest.fixture
+def baseline_predictions():
+    """Predictions of the original (pre-change) API for future_unseen_rows."""
+    with open(FIXTURES_DIR / "baseline_predictions.json") as f:
+        return json.load(f)["predictions"]
+
+
+@pytest.fixture
+def model_inputs(monkeypatch):
+    """Record every DataFrame passed to the model's predict()."""
+    from sklearn.pipeline import Pipeline
+
+    calls = []
+    original_predict = Pipeline.predict
+
+    def spy(self, X, **kwargs):
+        calls.append(X.copy())
+        return original_predict(self, X, **kwargs)
+
+    monkeypatch.setattr(Pipeline, "predict", spy)
+    return calls

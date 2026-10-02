@@ -7,7 +7,7 @@ test-build:
 # Run unit tests only (fast, no Docker Compose)
 test-unit: test-build
 	docker run --rm \
-		-v $(PWD)/test-results:/app/test-results \
+		-v "$(CURDIR)/test-results:/app/test-results" \
 		ml-api-test pytest test/unit -v
 
 # Run integration tests with Docker Compose
@@ -20,7 +20,7 @@ test-all: test-build
 	docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from test
 	@echo "Running unit tests..."
 	docker run --rm \
-		-v $(PWD)/test-results:/app/test-results \
+		-v "$(CURDIR)/test-results:/app/test-results" \
 		ml-api-test pytest test/unit -v
 
 # Clean up containers and test artifacts

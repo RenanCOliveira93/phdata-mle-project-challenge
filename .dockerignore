@@ -1,0 +1,13 @@
+# Keep the Docker build context small; images only COPY requirements, src, test and pytest.ini
+.git
+ph-env/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+test-results/
+notebooks/
+.env
+.env.*
+.DS_Store
